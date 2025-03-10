@@ -17,18 +17,29 @@
         <!-- 用户名输入域 -->
         <div class="input-group">
           <label>用户名</label>
-          <el-input placeholder="请输入用户名" />
+          <el-input v-model="form.username" placeholder="请输入用户名" /> <!-- 添加 v-model -->
         </div>
 
         <!-- 密码输入域 -->
         <div class="input-group">
           <label>密码</label>
-          <el-input type="password" placeholder="请输入密码" />
+          <el-input 
+            v-model="form.password"
+            type="password" 
+            placeholder="请输入密码" 
+          />
         </div>
-
+        <!-- 验证码输入域 -->
+        <div class="input-group">
+          <label>验证码</label>
+          <div class="captcha-wrapper">
+            <el-input v-model="form.captchaCode" placeholder="请输入验证码" style="width: 60%" />
+            <img :src="captchaImage" @click="getCaptcha" class="captcha-image" alt="验证码" />
+          </div>
+        </div>
         <!-- 操作按钮组 -->
         <div class="action-group">
-          <el-button type="primary" class="login-btn">立即登录</el-button>
+          <el-button type="primary" class="login-btn" :loading="loading"  @click="handleLogin">立即登录</el-button>
         </div>
 
         <!-- 辅助链接 -->
@@ -43,9 +54,56 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import authApi from '@/api/system'  
 
 const router = useRouter()
+const form = ref({
+  username: '',
+  password: '',
+  captchaCode: '',
+  captchaKey: ''
+})
+
+// 新增验证码相关逻辑
+const captchaImage = ref('')
+const loading = ref(false)
+
+// 1、初始化时获取验证码
+const getCaptcha = async () => {
+  try {
+    const res = await authApi.getCaptcha()
+    captchaImage.value = res.image
+    form.value.captchaKey = res.key
+  } catch (error) {
+    console.error('获取验证码失败:', error)
+  }
+}
+
+// 2、处理登录提交
+const handleLogin = async () => {
+  try {
+    loading.value = true
+    const res = await authApi.login({
+      username: form.value.username,
+      password: form.value.password,
+      captchaKey: form.value.captchaKey, // 确保传递 captchaKey
+      captchaCode: form.value.captchaCode
+    })
+    localStorage.setItem('token', res.token || res.data?.token)
+    router.push('/')
+  } catch (error) {
+    console.error('登录失败:', error)
+    ElMessage.error(error.response?.data?.message || '登录失败') // 添加错误提示
+    getCaptcha() // 登录失败刷新验证码
+  } finally {
+    loading.value = false
+  }
+}
+
+// 初始化获取验证码
+getCaptcha()
 
 // 新增游客登录方法
 const handleGuestLogin = () => {
