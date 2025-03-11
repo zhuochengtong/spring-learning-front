@@ -9,6 +9,12 @@ const service = axios.create({
 // 添加请求拦截器
 service.interceptors.request.use((config) => {
   config.headers['Content-Type'] = 'application/json'
+  const token = localStorage.getItem('token')
+  //console.log('请求拦截器:', token)
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  //console.log('请求配置:', config)
   return config
 })
 

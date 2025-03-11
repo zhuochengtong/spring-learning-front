@@ -98,11 +98,9 @@ const activeMenu = ref('/home')
 
 // 新增获取用户信息方法
 onMounted(async () => {
-  console.log('当前token:', localStorage.getItem('token'))
+  //console.log('当前token:', localStorage.getItem('token'))
   try {
-    const response = await loginApi.getUserInfo({
-      Authorization: `Bearer ${localStorage.getItem('token')}`
-    })
+    const response = await loginApi.getUserInfo()
     userInfo.value = response
   } catch (error) {
     console.error('获取用户信息失败:', error)

@@ -91,7 +91,7 @@ const handleLogin = async () => {
       captchaKey: form.value.captchaKey, // 确保传递 captchaKey
       captchaCode: form.value.captchaCode,
     })
-    console.log('当前token:', res.token)
+    // console.log('当前token:', res.token)
     localStorage.setItem('token', res.token || res.data?.token)
     router.push({ name: 'home' })
   } catch (error) {
