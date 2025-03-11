@@ -51,7 +51,7 @@ import { ElMessage } from 'element-plus' // 新增导入消息组件
 import { useRouter, useRoute } from 'vue-router' // 添加 useRoute
 import { ref, markRaw, onMounted, watch } from 'vue' // 添加 watch
 import { Upload, Download, Share, Delete, View, Setting, Files } from '@element-plus/icons-vue'
-import fileApi from '@/api/file'
+import fileApi from '@/api/file/file'
 import SparkMD5 from 'spark-md5'
 
 const router = useRouter()
@@ -342,3 +342,4 @@ const calcFileHash = (file) => {
   }
 }
 </style>
+@/api/file/file

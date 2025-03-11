@@ -52,7 +52,7 @@
             <el-dropdown>
               <span class="user-info">
                 <el-avatar :size="30" src="@/assets/user-avatar.png" />
-                <span class="username">管理员</span>
+                <span class="username">{{ userInfo.username }}</span>
                 <el-icon><ArrowDown /></el-icon>
               </span>
               <template #dropdown>
@@ -76,10 +76,9 @@
 </template>
 
 <script setup>
-// 在script setup顶部导入组件
-
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import loginApi from '@/api/system/login'
 import {
   PieChart,
   User,
@@ -88,20 +87,32 @@ import {
   ArrowDown
 } from '@element-plus/icons-vue'
 
+// 用户信息响应式对象
+const userInfo = ref({
+  username: '',
+  avatar: ''
+})
 
 const router = useRouter()
 const activeMenu = ref('/home')
 
-// 添加示例数据
-const chartData = ref({/* 图表数据 */})
-const quickActions = ref([
-  {
-    text: '新建用户',
-    type: 'primary',
-    handler: () => console.log('新建用户')
-  },
-  // 其他操作...
-])
+// 新增获取用户信息方法
+onMounted(async () => {
+  console.log('当前token:', localStorage.getItem('token'))
+  try {
+    const response = await loginApi.getUserInfo({
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    })
+    userInfo.value = response
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+    // 添加 token 失效处理
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      router.push('/login')
+    }
+  }
+})
 
 const logout = () => {
   localStorage.removeItem('token')

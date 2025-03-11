@@ -55,7 +55,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import authApi from '@/api/system'
+import loginApi from '@/api/system/login'
 
 const router = useRouter()
 const form = ref({
@@ -72,7 +72,8 @@ const loading = ref(false)
 // 1、初始化时获取验证码
 const getCaptcha = async () => {
   try {
-    const res = await authApi.getCaptcha()
+    const res = await loginApi.getCaptcha()
+    //console.log('res:', res)
     captchaImage.value = res.image
     form.value.captchaKey = res.key
   } catch (error) {
@@ -84,12 +85,13 @@ const getCaptcha = async () => {
 const handleLogin = async () => {
   try {
     loading.value = true
-    const res = await authApi.login({
+    const res = await loginApi.login({
       username: form.value.username,
       password: form.value.password,
       captchaKey: form.value.captchaKey, // 确保传递 captchaKey
       captchaCode: form.value.captchaCode,
     })
+    console.log('当前token:', res.token)
     localStorage.setItem('token', res.token || res.data?.token)
     router.push({ name: 'home' })
   } catch (error) {
@@ -207,3 +209,4 @@ const handleGuestLogin = () => {
   --el-link-active-color: #5daf34;
 }
 </style>
+@/api/system/system

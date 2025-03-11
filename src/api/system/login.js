@@ -1,4 +1,5 @@
 import request from '@/utils/axios'
+const prefix = '/api/system'
 
 export default {
   // 获取验证码
@@ -6,7 +7,7 @@ export default {
     return request({
       url: '/api/system/captcha',
       method: 'get',
-    }).then((res) => res.data?.data || {})
+    })
   },
 
   // 用户登录
@@ -15,14 +16,21 @@ export default {
       url: '/api/system/login',
       method: 'get',
       params: data,
-    }).then((res) => res.data?.data || {})
+    })
   },
 
   // 获取用户信息
-  getUserInfo(id) {
+  getUserInfo() {
     return request({
-      url: `/api/system/${id}`,
+      url: `/api/system/currentUser`,
       method: 'get',
-    }).then((res) => res.data?.data || {})
+    })
   },
 }
+
+// export function getCaptcha() {
+//   return request({
+//     url: '/api/system/captcha',
+//     method: 'GET',
+//   })
+// }
