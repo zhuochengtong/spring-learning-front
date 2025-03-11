@@ -17,17 +17,14 @@
         <!-- 用户名输入域 -->
         <div class="input-group">
           <label>用户名</label>
-          <el-input v-model="form.username" placeholder="请输入用户名" /> <!-- 添加 v-model -->
+          <el-input v-model="form.username" placeholder="请输入用户名" />
+          <!-- 添加 v-model -->
         </div>
 
         <!-- 密码输入域 -->
         <div class="input-group">
           <label>密码</label>
-          <el-input 
-            v-model="form.password"
-            type="password" 
-            placeholder="请输入密码" 
-          />
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" />
         </div>
         <!-- 验证码输入域 -->
         <div class="input-group">
@@ -39,7 +36,9 @@
         </div>
         <!-- 操作按钮组 -->
         <div class="action-group">
-          <el-button type="primary" class="login-btn" :loading="loading"  @click="handleLogin">立即登录</el-button>
+          <el-button type="primary" class="login-btn" :loading="loading" @click="handleLogin"
+            >立即登录</el-button
+          >
         </div>
 
         <!-- 辅助链接 -->
@@ -56,14 +55,14 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import authApi from '@/api/system'  
+import authApi from '@/api/system'
 
 const router = useRouter()
 const form = ref({
-  username: '',
-  password: '',
+  username: 'admin',  // 设置默认用户名
+  password: 'admin',   // 设置默认密码
   captchaCode: '',
-  captchaKey: ''
+  captchaKey: '',
 })
 
 // 新增验证码相关逻辑
@@ -89,10 +88,10 @@ const handleLogin = async () => {
       username: form.value.username,
       password: form.value.password,
       captchaKey: form.value.captchaKey, // 确保传递 captchaKey
-      captchaCode: form.value.captchaCode
+      captchaCode: form.value.captchaCode,
     })
     localStorage.setItem('token', res.token || res.data?.token)
-    router.push('/')
+    router.push({ name: 'home' })
   } catch (error) {
     console.error('登录失败:', error)
     ElMessage.error(error.response?.data?.message || '登录失败') // 添加错误提示

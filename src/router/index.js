@@ -39,11 +39,11 @@ const router = createRouter({
       },
     },
     {
-      path: '/test',
-      name: 'test',
-      component: () => import('@/views/test.vue'), // 需要创建该组件
+      path: '/home',
+      name: 'home',
+      component: () => import('@/views/Home.vue'), // 需要创建该组件
       meta: {
-        title: '测试页面',
+        title: '主页',
         requiresAuth: false,
       },
     },
