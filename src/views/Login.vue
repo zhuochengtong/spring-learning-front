@@ -112,7 +112,7 @@ const handleGuestLogin = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss"> 
 /* 根容器 */
 .login-container {
   min-height: 100vh;
