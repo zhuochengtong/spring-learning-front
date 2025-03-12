@@ -12,7 +12,7 @@ service.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   //console.log('请求拦截器:', token)
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = `${token}`
   }
   //console.log('请求配置:', config)
   return config
