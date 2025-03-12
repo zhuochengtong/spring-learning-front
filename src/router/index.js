@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import Test from '@/views/Test.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +33,21 @@ const router = createRouter({
         title: '主页',
         requiresAuth: false,
       },
+      children: [
+        // 动态路由将在菜单加载后添加
+       ]
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: Test, 
+      meta: {
+        title: '测试页面',
+        requiresAuth: false,
+      },
+      children: [
+       // 动态路由将在菜单加载后添加
+      ]
     },
   ],
 })

@@ -1,219 +1,177 @@
-<!-- 代码已包含 CSS：使用 TailwindCSS , 安装 TailwindCSS 后方可看到布局样式效果 -->
-
 <template>
-    <div class="min-h-screen bg-gray-50">
-      <!-- 顶部导航 -->
-      <header class="bg-white shadow-sm h-14 flex items-center justify-between px-4 fixed w-full top-0 z-50">
-        <div class="flex items-center space-x-4">
-          <img src="https://ai-public.mastergo.com/ai/img_res/3d83a115ca5ebf4bac4f145fe829be00.jpg" 
-               alt="Logo" 
-               class="h-8 w-8"/>
-          <h1 class="text-lg font-medium">应用支撑平台</h1>
-          <el-button type="primary" class="!rounded-button">
-            <el-icon><Grid /></el-icon>
-          </el-button>
-        </div>
-        
-        <div class="flex items-center space-x-4">
-          <el-button class="!rounded-button whitespace-nowrap">
-            <el-icon><Connection /></el-icon>
-            应用切换
-          </el-button>
-          <div class="flex space-x-3">
-            <el-icon><Search /></el-icon>
-            <el-icon><Star /></el-icon>
-            <el-icon><Message /></el-icon>
-            <el-icon><Bell /></el-icon>
-            <el-icon><FullScreen /></el-icon>
-            <el-icon><Refresh /></el-icon>
-            <el-icon><Setting /></el-icon>
-          </div>
-          <el-avatar size="small" src="https://ai-public.mastergo.com/ai/img_res/a93bbe33fd3e1e553f303ad4f4dd93ec.jpg" />
-        </div>
-      </header>
-  
-      <!-- 主体内容 -->
-      <div class="flex pt-14">
-        <!-- 左侧菜单 -->
-        <aside class="w-48 bg-white h-screen fixed left-0 shadow-sm">
-          <el-menu default-active="8" class="h-full">
-            <el-menu-item index="1">
-              <el-icon><Document /></el-icon>
-              <span>协同办公</span>
-            </el-menu-item>
-            <el-menu-item index="2">
-              <el-icon><Monitor /></el-icon>
-              <span>在线开发</span>
-            </el-menu-item>
-            <el-menu-item index="3">
-              <el-icon><Share /></el-icon>
-              <span>统一流程</span>
-            </el-menu-item>
-            <el-menu-item index="4">
-              <el-icon><Lock /></el-icon>
-              <span>安全审计</span>
-            </el-menu-item>
-            <el-menu-item index="5">
-              <el-icon><DataLine /></el-icon>
-              <span>数据应用</span>
-            </el-menu-item>
-            <el-menu-item index="6">
-              <el-icon><Service /></el-icon>
-              <span>消息中心</span>
-            </el-menu-item>
-            <el-menu-item index="7">
-              <el-icon><Setting /></el-icon>
-              <span>系统管理</span>
-            </el-menu-item>
-            <el-menu-item index="8">
-              <el-icon><Message /></el-icon>
-              <span>系统公告</span>
-            </el-menu-item>
-          </el-menu>
-        </aside>
-  
-        <!-- 右侧内容 -->
-        <main class="flex-1 ml-48 p-6">
-          <!-- 面包屑 -->
-          <el-breadcrumb separator=">" class="mb-4">
-            <el-breadcrumb-item>首页</el-breadcrumb-item>
-            <el-breadcrumb-item>系统公告</el-breadcrumb-item>
-          </el-breadcrumb>
-  
-          <!-- 搜索区域 -->
-          <div class="bg-white p-4 rounded-lg mb-4">
-            <div class="flex items-center space-x-4">
-              <el-input
-                v-model="searchKeyword"
-                placeholder="请输入关键词"
-                class="w-64"
-              >
-                <template #prefix>
-                  <el-icon><Search /></el-icon>
-                </template>
-              </el-input>
-              
-              <el-select v-model="searchType" placeholder="请选择类型" class="w-48">
-                <el-option label="全部" value="" />
-                <el-option label="公告" value="notice" />
-                <el-option label="通知" value="notification" />
-              </el-select>
-  
-              <el-select v-model="searchStatus" placeholder="请选择状态" class="w-48">
-                <el-option label="全部" value="" />
-                <el-option label="待发送" value="pending" />
-                <el-option label="已发送" value="sent" />
-              </el-select>
-  
-              <el-button type="primary" class="!rounded-button whitespace-nowrap">
-                查询
-              </el-button>
-              <el-button class="!rounded-button whitespace-nowrap">
-                重置
-              </el-button>
-              <el-button type="primary" class="!rounded-button whitespace-nowrap ml-auto">
-                <el-icon><Plus /></el-icon>
-                新建
-              </el-button>
-            </div>
-          </div>
-  
-          <!-- 表格 -->
-          <div class="bg-white rounded-lg">
-            <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="id" label="序号" width="80" />
-              <el-table-column prop="title" label="标题" />
-              <el-table-column prop="type" label="类型" width="120" />
-              <el-table-column prop="expireTime" label="失效时间" width="180" />
-              <el-table-column prop="creator" label="创建人" width="120" />
-              <el-table-column prop="createTime" label="创建时间" width="180" />
-              <el-table-column prop="publisher" label="发布人" width="120" />
-              <el-table-column prop="publishTime" label="发布时间" width="180" />
-              <el-table-column prop="status" label="状态" width="120">
-                <template #default="scope">
-                  <el-tag :type="scope.row.status === '已发送' ? 'success' : 'warning'">
-                    {{ scope.row.status }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="180">
-                <template #default>
-                  <el-button link type="primary" class="!rounded-button">编辑</el-button>
-                  <el-button link type="primary" class="!rounded-button">删除</el-button>
-                  <el-dropdown>
-                    <el-button link type="primary" class="!rounded-button">
-                      更多<el-icon><ArrowDown /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item>查看详情</el-dropdown-item>
-                        <el-dropdown-item>复制</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </template>
-              </el-table-column>
-            </el-table>
-  
-            <!-- 分页 -->
-            <div class="flex justify-between items-center p-4">
-              <span class="text-gray-500">共 2 条数据</span>
-              <el-pagination
-                :current-page="currentPage"
-                :page-size="20"
-                layout="prev, pager, next"
-                :total="2"
-              />
-            </div>
-          </div>
-        </main>
+  <el-container class="system-container">
+    <!-- 侧边栏 -->
+    <el-aside width="200px" class="sidebar">
+      <div class="logo-wrap">
+        <img src="@/assets/logo.png" class="logo" />
+        <span class="system-title">后台管理系统</span>
       </div>
-    </div>
-  </template>
-  
-  <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { 
-    Search, Grid, Connection, Star, Message, Bell, FullScreen, 
-    Refresh, Setting, Document, Monitor, Share, Lock, DataLine, 
-    Service, Plus, ArrowDown 
-  } from '@element-plus/icons-vue';
-  
-  const searchKeyword = ref('');
-  const searchType = ref('');
-  const searchStatus = ref('');
-  const currentPage = ref(1);
-  
-  const tableData = ref([
-    {
-      id: 1,
-      title: '公告来源',
-      type: '公告',
-      expireTime: '',
-      creator: '管理员/admin',
-      createTime: '2025-01-08 14:20:19',
-      publisher: '',
-      publishTime: '',
-      status: '待发送'
-    },
-    {
-      id: 2,
-      title: '新增公告',
-      type: '公告',
-      expireTime: '',
-      creator: '管理员/admin',
-      createTime: '2025-01-10 09:23:29',
-      publisher: '管理员/admin',
-      publishTime: '2025-02-14 11:15:15',
-      status: '已发送'
+      
+      <el-menu
+        :default-active="activeMenu"
+        router
+        class="system-menu"
+        background-color="#304156"
+        text-color="#fff"
+        active-text-color="#409EFF"
+      >
+        <el-menu-item index="/home">
+          <el-icon><PieChart /></el-icon>
+          <span>首页</span>
+        </el-menu-item>
+
+        <el-sub-menu index="2">
+          <template #title>
+            <el-icon><User /></el-icon>
+            <span>用户管理</span>
+          </template>
+          <el-menu-item index="/user/list">用户列表</el-menu-item>
+          <el-menu-item index="/user/role">角色管理</el-menu-item>
+        </el-sub-menu>
+
+        <el-sub-menu index="3">
+          <template #title>
+            <el-icon><Lock /></el-icon>
+            <span>权限管理</span>
+          </template>
+          <el-menu-item index="/permission/list">权限列表</el-menu-item>
+          <el-menu-item index="/permission/assign">权限分配</el-menu-item>
+        </el-sub-menu>
+      </el-menu>
+    </el-aside>
+
+    <el-container>
+      <!-- 顶部导航 -->
+      <el-header class="header">
+        <div class="header-right">
+          <el-space :size="20">
+            <el-badge :value="3" class="badge">
+              <el-icon :size="20"><Bell /></el-icon>
+            </el-badge>
+            
+            <el-dropdown>
+              <span class="user-info">
+                <el-avatar :size="30" src="@/assets/user-avatar.png" />
+                <span class="username">{{ userInfo.username }}</span>
+                <el-icon><ArrowDown /></el-icon>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>个人中心</el-dropdown-item>
+                  <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </el-space>
+        </div>
+      </el-header>
+
+      <!-- 内容区域 -->
+      <el-main class="main-content">
+        <div>首页内容展示</div>
+    
+      </el-main>
+    </el-container>
+  </el-container>
+</template>
+
+<script setup>
+import { ref,onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getUserInfo } from '@/api/system/login'
+import {
+  PieChart,
+  User,
+  Lock,
+  Bell,
+  ArrowDown
+} from '@element-plus/icons-vue'
+
+// 用户信息响应式对象
+const userInfo = ref({
+  username: '',
+  avatar: ''
+})
+
+const router = useRouter()
+const activeMenu = ref('/home')
+
+// 新增获取用户信息方法
+onMounted(async () => {
+  //console.log('当前token:', localStorage.getItem('token'))
+  try {
+    const response = await getUserInfo()
+    userInfo.value = response
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+    // 添加 token 失效处理
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      router.push('/login')
     }
-  ]);
-  </script>
-  
-  <style scoped lang="scss"> 
-  .el-menu {
-    border-right: none;
   }
-  </style>
+})
+
+const logout = () => {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
+</script>
+
+<style scoped lang="scss"> 
+.system-container {
+  height: 100vh;
+}
+
+.sidebar {
+  background: #304156;
+  transition: width 0.3s;
+}
+
+.logo-wrap {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  color: #fff;
   
+  .logo {
+    width: 32px;
+    margin-right: 10px;
+  }
   
+  .system-title {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+}
+
+.main-content {
+  background: #f5f7f9;
+  padding: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  
+  .username {
+    font-size: 14px;
+  }
+}
+
+.badge :deep(.el-badge__content) {
+  top: 12px;
+  right: 12px;
+}
+</style>

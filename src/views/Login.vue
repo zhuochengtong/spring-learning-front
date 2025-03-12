@@ -13,7 +13,7 @@
       </header>
 
       <!-- 表单容器 -->
-      <div class="form-container">
+      <div class="form-container" @keyup.enter="handleLogin">
         <!-- 用户名输入域 -->
         <div class="input-group">
           <label>用户名</label>
@@ -31,7 +31,7 @@
           <label>验证码</label>
           <div class="captcha-wrapper">
             <el-input v-model="form.captchaCode" placeholder="请输入验证码" style="width: 60%" />
-            <img :src="captchaImage" @click="getCaptcha" class="captcha-image" alt="验证码" />
+            <img :src="captchaImage" @click="getCaptchaImage" class="captcha-image" alt="验证码" />
           </div>
         </div>
         <!-- 操作按钮组 -->
@@ -55,7 +55,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import loginApi from '@/api/system/login'
+// 修改导入方式，使用命名导入
+import { getCaptcha, login, getUserInfo } from '@/api/system/login'
 
 const router = useRouter()
 const form = ref({
@@ -70,9 +71,9 @@ const captchaImage = ref('')
 const loading = ref(false)
 
 // 1、初始化时获取验证码
-const getCaptcha = async () => {
+const getCaptchaImage = async () => {
   try {
-    const res = await loginApi.getCaptcha()
+    const res = await getCaptcha()
     //console.log('res:', res)
     captchaImage.value = res.image
     form.value.captchaKey = res.key
@@ -85,7 +86,7 @@ const getCaptcha = async () => {
 const handleLogin = async () => {
   try {
     loading.value = true
-    const res = await loginApi.login({
+    const res = await login({
       username: form.value.username,
       password: form.value.password,
       captchaKey: form.value.captchaKey, // 确保传递 captchaKey
@@ -97,14 +98,14 @@ const handleLogin = async () => {
   } catch (error) {
     console.error('登录失败:', error)
     ElMessage.error(error.response?.data?.message || '登录失败') // 添加错误提示
-    getCaptcha() // 登录失败刷新验证码
+    getCaptchaImage() // 登录失败刷新验证码
   } finally {
     loading.value = false
   }
 }
 
 // 初始化获取验证码
-getCaptcha()
+getCaptchaImage()
 
 // 新增游客登录方法
 const handleGuestLogin = () => {

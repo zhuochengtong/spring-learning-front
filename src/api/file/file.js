@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import request from '@/utils/request'
 
 // 修改接口路径匹配代理配置
 export default {
