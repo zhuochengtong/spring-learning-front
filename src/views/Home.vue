@@ -23,19 +23,31 @@
             <el-icon><component :is="icon" /></el-icon>
           </el-button>
         </div>
-        <div class="user-info">
-          <el-avatar 
+
+        <el-dropdown>
+          <span class="user-info">
+            <el-avatar 
             src="https://ai-public.mastergo.com/ai/img_res/a93bbe33fd3e1e553f303ad4f4dd93ec.jpg"
             class="avatar"
-          />
-          <span class="username">{{ userInfo.username }}</span>
-        </div>
+            />
+            <span class="username">{{ userInfo.username }}</span>
+            <el-icon><ArrowDown /></el-icon>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>个人中心</el-dropdown-item>
+              <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
       </div>
     </el-header>
   
     <div class="main-container">
       <!-- 侧边栏 -->
       <el-aside width="220px" class="sidebar">
+        <!-- <menu-item> 标签就是使用了导入的MenuItem组件。这个组件接收一个 menu-item 属性，用于渲染菜单项 -->
         <el-menu
           :default-active="activeMenu"
           class="menu"
@@ -58,11 +70,12 @@
         <!-- 面包屑 -->
         <div class="breadcrumb-container">
           <el-breadcrumb separator="/" class="breadcrumb">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item>系统公告</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/home' }">
+              <el-icon><HomeFilled /></el-icon>
+            </el-breadcrumb-item>
+            <el-breadcrumb-item>{{ currentMenuTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
-
         <!-- 内容区域 -->
         <router-view />
       </el-main>
@@ -71,14 +84,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router' // 添加useRouter导入
 import {
   Grid, Connection, Search, Plus,
   ArrowDown, User, Bell, Setting,
   RefreshRight, Expand, Star, ChatDotRound,
   Document, Monitor, Share, Lock, DataAnalysis, Headset,
-  Menu, Avatar, InfoFilled
+  Menu, Avatar, InfoFilled, HomeFilled
 } from '@element-plus/icons-vue'
 import { getMenuList } from '@/api/system/menu'
 import { getUserInfo } from '@/api/system/login'
@@ -90,13 +103,6 @@ const router = useRouter() // 现在这行不会报错了
 const activeMenu = ref('')
 const menuTree = ref([])
 const headerIcons = [Search, Star, ChatDotRound, Bell, Expand, RefreshRight]
-
-const searchKey = ref('')
-const selectedType = ref('')
-const selectedStatus = ref('')
-const tableData = ref([
-  // 表格数据保持不变
-])
 
 // 用户信息响应式对象
 const userInfo = ref({
@@ -118,6 +124,15 @@ onMounted(async () => {
       router.push('/login')
     }
   }
+})
+// 计算当前菜单标题
+const currentMenuTitle = computed(() => {
+  return getCurrentMenuTitle()
+})
+
+// 监听路由变化，更新激活的菜单项
+watch(() => route.path, (newPath) => {
+  activeMenu.value = newPath
 })
 
 // 获取当前菜单标题
@@ -165,7 +180,7 @@ const addDynamicRoutes = (menuItems) => {
           };
           
           // 添加路由 - 确保路径不包含中文或特殊字符
-          router.addRoute('test', {
+          router.addRoute('home', {
             path: item.path,
             name: item.name,
             component: asyncComponent,
@@ -219,6 +234,11 @@ const fetchMenuData = async () => {
 onMounted(() => {
   fetchMenuData()
 })
+
+const logout = () => {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
 </script>
 
 <style scoped lang="scss"> 
