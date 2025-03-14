@@ -19,8 +19,29 @@
           <span>应用切换</span>
         </el-button>
         <div class="action-buttons">
-          <el-button type="primary" link v-for="icon in headerIcons" :key="icon">
-            <el-icon><component :is="icon" /></el-icon>
+          <!-- 搜索按钮 -->
+          <el-button type="primary" link>
+            <el-icon><Search /></el-icon>
+          </el-button>
+          <!-- 收藏按钮 -->
+          <el-button type="primary" link>
+            <el-icon><Star /></el-icon>
+          </el-button>
+          <!-- 聊天会话按钮 -->
+          <el-button type="primary" link>
+            <el-icon><ChatDotRound /></el-icon>
+          </el-button>
+          <!-- 消息通知按钮 -->
+          <el-button type="primary" link>
+            <el-icon><Bell /></el-icon>
+          </el-button>
+          <!-- 扩展按钮 -->
+          <el-button type="primary" link>
+            <el-icon><Expand /></el-icon>
+          </el-button>
+          <!-- 添加刷新按钮 -->
+          <el-button type="primary" link @click="refreshPage" title="刷新页面">
+            <el-icon><RefreshRight /></el-icon>
           </el-button>
         </div>
 
@@ -86,6 +107,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router' // 添加useRouter导入
+import { ElLoading } from 'element-plus' // 添加ElLoading导入
 import {
   Grid, Connection, Search, Plus,
   ArrowDown, User, Bell, Setting,
@@ -102,7 +124,28 @@ const route = useRoute()
 const router = useRouter() // 现在这行不会报错了
 const activeMenu = ref('')
 const menuTree = ref([])
-const headerIcons = [Search, Star, ChatDotRound, Bell, Expand, RefreshRight]
+
+// 添加刷新页面方法
+const refreshPage = () => {
+  // 显示加载状态
+  const loading = ElLoading.service({
+    lock: true,
+    text: '页面刷新中...',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
+  
+  // 刷新当前路由
+  setTimeout(() => {
+    router.replace({
+      path: '/redirect' + route.fullPath
+    }).catch(() => {
+      // 如果没有设置redirect路由，则使用window.location.reload()
+      window.location.reload()
+    }).finally(() => {
+      loading.close()
+    })
+  }, 300)
+}
 
 // 用户信息响应式对象
 const userInfo = ref({
@@ -169,11 +212,21 @@ const addDynamicRoutes = (menuItems) => {
           // 创建一个动态组件加载函数
           const asyncComponent = () => {
             return new Promise((resolve, reject) => {
-              // 使用更安全的方式加载组件
-              import(`../views/${item.component}.vue`)
-                .then(module => resolve(module))
+              // 打印组件路径，帮助调试
+              console.log(`尝试加载组件: ${item.component}`);
+              
+              // 根据组件名称动态导入对应组件
+              const componentPath = `../views/system/${item.component}.vue`;
+              console.log('实际加载路径:', componentPath);
+              
+              import(componentPath)
+                .then(module => {
+                  console.log(`组件 ${item.component} 加载成功`);
+                  resolve(module);
+                })
                 .catch(error => {
                   console.warn(`组件 ${item.component} 不存在，使用默认组件`);
+                  console.error('组件加载错误详情:', error);
                   import('../components/NotFound.vue').then(module => resolve(module));
                 });
             });
@@ -182,11 +235,15 @@ const addDynamicRoutes = (menuItems) => {
           // 添加路由 - 确保路径不包含中文或特殊字符
           router.addRoute('home', {
             path: item.path,
-            name: item.name,
+            name: item.name || item.path.substring(1).replace(/\//g, '-'),
             component: asyncComponent,
             meta: {
               title: item.title,
-              requiresAuth: false
+              icon: item.icon,
+              permission: item.permission,
+              keepAlive: item.keepAlive === 1,
+              requiresAuth: true,
+              type: item.type
             }
           });
           
@@ -204,6 +261,9 @@ const addDynamicRoutes = (menuItems) => {
   };
   
   processMenuItems(menuItems);
+  
+  // 保存菜单数据到localStorage，用于刷新后恢复
+  localStorage.setItem('menuData', JSON.stringify(menuItems));
 };
 
 // 获取菜单数据
@@ -212,7 +272,22 @@ const fetchMenuData = async () => {
     const response = await getMenuList()
     console.log("菜单数据:", response)
     
+    // 检查菜单数据中的组件路径
+    const checkComponentPaths = (items) => {
+      items.forEach(item => {
+        if (item.component) {
+          console.log(`菜单项 ${item.title} 的组件路径: ${item.component}`);
+        }
+        if (item.children && item.children.length) {
+          checkComponentPaths(item.children);
+        }
+      });
+    };
+    
     if (response) {
+      // 检查组件路径
+      checkComponentPaths(response);
+      
       // 直接使用后端返回的数据
       menuTree.value = response
       
@@ -224,7 +299,7 @@ const fetchMenuData = async () => {
         activeMenu.value = menuTree.value[0].path
       }
     } else {
-      console.error('获取菜单11数据失败:', response)
+      console.error('获取菜单数据失败:', response)
     }
   } catch (error) {
     console.error('获取菜单数据失败:', error)
