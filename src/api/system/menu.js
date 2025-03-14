@@ -12,6 +12,44 @@ export function getMenuList() {
 }
 
 /**
+ * 添加菜单
+ * @param {Object} data 菜单数据
+ * @returns {Promise}
+ */
+export function addMenu(data) {
+  return request({
+    url: '/api/system/menu',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新菜单
+ * @param {Object} data 菜单数据
+ * @returns {Promise}
+ */
+export function updateMenu(data) {
+  return request({
+    url: '/api/system/menu',
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除菜单
+ * @param {Number} id 菜单ID
+ * @returns {Promise}
+ */
+export function deleteMenu(id) {
+  return request({
+    url: `/api/system/menu/${id}`,
+    method: 'delete'
+  })
+}
+
+/**
  * 获取菜单图标组件
  * @param {String} iconName 图标名称
  * @returns {String} 对应的Element Plus图标组件名
