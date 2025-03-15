@@ -75,8 +75,8 @@ const getCaptchaImage = async () => {
   try {
     const res = await getCaptcha()
     //console.log('res:', res)
-    captchaImage.value = res.image
-    form.value.captchaKey = res.key
+    captchaImage.value = res.data.image
+    form.value.captchaKey = res.data.key
   } catch (error) {
     console.error('获取验证码失败:', error)
   }

@@ -158,7 +158,7 @@ onMounted(async () => {
   //console.log('当前token:', localStorage.getItem('token'))
   try {
     const response = await getUserInfo()
-    userInfo.value = response
+    userInfo.value = response.data
   } catch (error) {
     console.error('获取用户信息失败:', error)
     // 添加 token 失效处理
@@ -270,7 +270,7 @@ const addDynamicRoutes = (menuItems) => {
 const fetchMenuData = async () => {
   try {
     const response = await getMenuList()
-    console.log("菜单数据:", response)
+    console.log("菜单数据:", response.data)
     
     // 检查菜单数据中的组件路径
     const checkComponentPaths = (items) => {
@@ -284,12 +284,12 @@ const fetchMenuData = async () => {
       });
     };
     
-    if (response) {
+    if (response.data) {
       // 检查组件路径
-      checkComponentPaths(response);
+      checkComponentPaths(response.data);
       
       // 直接使用后端返回的数据
-      menuTree.value = response
+      menuTree.value = response.data
       
       // 动态添加路由
       addDynamicRoutes(menuTree.value)
@@ -299,7 +299,7 @@ const fetchMenuData = async () => {
         activeMenu.value = menuTree.value[0].path
       }
     } else {
-      console.error('获取菜单数据失败:', response)
+      console.error('获取菜单数据失败:', response.data)
     }
   } catch (error) {
     console.error('获取菜单数据失败:', error)

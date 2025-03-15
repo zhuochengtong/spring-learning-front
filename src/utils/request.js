@@ -23,7 +23,7 @@ service.interceptors.response.use(
   (response) => {
     console.log('原始响应:', response)
     if (response.data?.code === 200) {
-      return response.data.data // 返回嵌套的业务数据
+      return response.data // 返回嵌套的业务数据
     }
     return Promise.reject(response.data?.msg || '请求异常')
   },
