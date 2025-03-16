@@ -18,7 +18,7 @@ export function getMenuList() {
  */
 export function addMenu(data) {
   return request({
-    url: '/api/system/menu',
+    url: '/api/system/menu/create',
     method: 'post',
     data
   })
@@ -29,9 +29,9 @@ export function addMenu(data) {
  * @param {Object} data 菜单数据
  * @returns {Promise}
  */
-export function updateMenu(data) {
+export function updateMenu(id,data) {
   return request({
-    url: '/api/system/menu',
+    url: `/api/system/menu/${id}`,
     method: 'put',
     data
   })
