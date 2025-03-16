@@ -57,6 +57,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 // 修改导入方式，使用命名导入
 import { getCaptcha, login, getUserInfo } from '@/api/system/login'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const form = ref({
