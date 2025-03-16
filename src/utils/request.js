@@ -28,8 +28,25 @@ service.interceptors.response.use(
     return Promise.reject(response.data?.msg || '请求异常')
   },
   (error) => {
+    // 处理401错误（未授权，通常是token过期）
+    if (error.response && error.response.status === 401) {
+      // 清除本地存储的token
+      localStorage.removeItem('token')
+      
+      // 使用Element Plus的消息提示
+      ElMessage.error({
+        message: '登录已过期，请重新登录',
+        duration: 3000
+      })
+      
+      // 延迟跳转到登录页，让用户有时间看到提示信息
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 1500)
+    }
+    
     console.error('请求错误:', error)
     return Promise.reject(error)
-  },
+  }
 )
 export default service
