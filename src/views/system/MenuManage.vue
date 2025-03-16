@@ -14,7 +14,7 @@
           <el-icon><Expand /></el-icon>展开/折叠
         </el-button>
         <!-- 刷新按钮：重新加载菜单数据 -->
-        <el-button type="warning">
+        <el-button type="warning" @click="handleRefresh">
           <el-icon><RefreshRight /></el-icon>刷新
         </el-button>
       </div>
@@ -189,11 +189,13 @@ import { onMounted } from 'vue'
 // 导入Element Plus消息提示组件
 import { ElMessage, ElMessageBox } from 'element-plus'
 // 导入pinia store，用于刷新左侧菜单
-// import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
+import { useMenuStore } from '@/stores/menu'
 
 // 2、基础响应式数据定义
-// 获取用户store，用于刷新左侧菜单
-// const userStore = useUserStore()
+// 获取用户store和菜单store，用于刷新左侧菜单
+const userStore = useUserStore()
+const menuStore = useMenuStore()
 // 搜索关键字：用于菜单搜索功能
 const searchKey = ref('')
 // 菜单数据列表：存储从后端获取的菜单数据
@@ -385,8 +387,8 @@ const submitMenuForm = async () => {
     dialogVisible.value = false
     // 刷新菜单数据
     await fetchMenuData()
-    // 刷新左侧菜单 - 调用store中的方法重新获取用户菜单
-    //await userStore.getUserMenus()
+    // 刷新左侧菜单 - 调用store中的方法重新获取菜单
+    await menuStore.refreshMenuData()
   } catch (error) {
     console.error('表单验证或提交失败:', error)
     ElMessage.error(isEdit.value ? '更新菜单失败' : '新增菜单失败')
@@ -401,7 +403,7 @@ const submitMenuForm = async () => {
  */
 const handlDeleteMenu = async (row) => {
   // 显示确认对话框
-  ElMessageBox.confirm('确认删除改菜单吗？', '提示', {
+  ElMessageBox.confirm('确认删除该菜单吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -414,6 +416,8 @@ const handlDeleteMenu = async (row) => {
         if (res.code === 200) {
           // 删除成功，刷新菜单数据
           await fetchMenuData()
+          // 刷新左侧菜单
+          await menuStore.refreshMenuData()
           ElMessage.success('删除菜单成功')
         } else {
           // 删除失败，显示错误信息
@@ -428,6 +432,13 @@ const handlDeleteMenu = async (row) => {
       // 用户取消删除
       ElMessage.info('已取消删除')
     })
+}
+/**
+ * 刷新菜单数据
+ */
+const handleRefresh = async () => {
+  await fetchMenuData()
+  ElMessage.success('菜单数据已刷新')
 }
 
 /**

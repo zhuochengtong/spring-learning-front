@@ -35,6 +35,16 @@ const router = createRouter({
         requiresAuth: false,
       },
       children: [
+        // 添加菜单管理路由
+        {
+          path: '/system/menu',
+          name: 'system-menu',
+          component: () => import('@/views/system/MenuManage.vue'),
+          meta: {
+            title: '菜单管理',
+            requiresAuth: true,
+          },
+        },
         // 动态路由将在菜单加载后添加
       ],
     },
