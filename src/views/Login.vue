@@ -60,8 +60,8 @@ import { getCaptcha, login, getUserInfo } from '@/api/system/login'
 
 const router = useRouter()
 const form = ref({
-  username: 'admin',  // 设置默认用户名
-  password: 'admin',   // 设置默认密码
+  username: 'admin', // 设置默认用户名
+  password: 'admin', // 设置默认密码
   captchaCode: '',
   captchaKey: '',
 })
@@ -113,7 +113,7 @@ const handleGuestLogin = () => {
 }
 </script>
 
-<style scoped lang="scss"> 
+<style scoped lang="scss">
 /* 根容器 */
 .login-container {
   min-height: 100vh;

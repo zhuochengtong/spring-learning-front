@@ -36,21 +36,21 @@ const router = createRouter({
       },
       children: [
         // 动态路由将在菜单加载后添加
-       ]
+      ],
     },
     {
       path: '/test',
       name: 'test',
-      component: Test, 
+      component: Test,
       meta: {
         title: '测试页面',
         requiresAuth: false,
       },
       children: [
-       // 动态路由将在菜单加载后添加
-      ]
+        // 动态路由将在菜单加载后添加
+      ],
     },
-    
+
     // 添加404路由
     {
       path: '/:pathMatch(.*)*',
@@ -58,8 +58,8 @@ const router = createRouter({
       component: () => import('@/components/NotFound.vue'),
       meta: {
         title: '页面不存在',
-        requiresAuth: false
-      }
+        requiresAuth: false,
+      },
     },
     // 添加重定向路由
     {
@@ -69,10 +69,10 @@ const router = createRouter({
       children: [
         {
           path: '/redirect/:path(.*)',
-          component: () => import('@/views/Redirect.vue')
-        }
-      ]
-    }
+          component: () => import('@/views/Redirect.vue'),
+        },
+      ],
+    },
   ],
 })
 
@@ -81,6 +81,5 @@ router.beforeEach((to, from, next) => {
   document.title = to.meta.title || '默认标题'
   next()
 })
-
 
 export default router

@@ -7,7 +7,7 @@ import request from '@/utils/request'
 export function getMenuList() {
   return request({
     url: '/api/system/menu/list',
-    method: 'get'
+    method: 'get',
   })
 }
 
@@ -20,7 +20,7 @@ export function addMenu(data) {
   return request({
     url: '/api/system/menu/create',
     method: 'post',
-    data
+    data,
   })
 }
 
@@ -29,11 +29,11 @@ export function addMenu(data) {
  * @param {Object} data 菜单数据
  * @returns {Promise}
  */
-export function updateMenu(id,data) {
+export function updateMenu(id, data) {
   return request({
     url: `/api/system/menu/${id}`,
     method: 'put',
-    data
+    data,
   })
 }
 
@@ -45,7 +45,7 @@ export function updateMenu(id,data) {
 export function deleteMenu(id) {
   return request({
     url: `/api/system/menu/${id}`,
-    method: 'delete'
+    method: 'delete',
   })
 }
 
@@ -57,18 +57,18 @@ export function deleteMenu(id) {
 export function getIconComponent(iconName) {
   // 图标名称映射表，将后端返回的图标名映射到Element Plus图标组件
   const iconMap = {
-    'setting': 'Setting',
-    'user': 'User',
-    'avatar': 'Avatar',
-    'menu': 'Menu',
-    'info': 'InfoFilled',
-    'document': 'Document',
-    'monitor': 'Monitor',
-    'share': 'Share',
-    'lock': 'Lock',
+    setting: 'Setting',
+    user: 'User',
+    avatar: 'Avatar',
+    menu: 'Menu',
+    info: 'InfoFilled',
+    document: 'Document',
+    monitor: 'Monitor',
+    share: 'Share',
+    lock: 'Lock',
     'data-analysis': 'DataAnalysis',
-    'headset': 'Headset',
-    'chat-dot-round': 'ChatDotRound'
+    headset: 'Headset',
+    'chat-dot-round': 'ChatDotRound',
   }
 
   return iconMap[iconName] || 'Document' // 默认返回Document图标

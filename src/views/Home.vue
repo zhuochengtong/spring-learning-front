@@ -3,10 +3,7 @@
     <!-- 头部 -->
     <el-header class="header">
       <div class="left-section">
-        <el-image 
-          src="https://placeholder.com/logo.png"
-          class="logo"
-        />
+        <el-image src="https://placeholder.com/logo.png" class="logo" />
         <h1 class="title">应用支撑平台</h1>
         <el-button type="primary" link class="grid-btn">
           <el-icon><Grid /></el-icon>
@@ -47,9 +44,9 @@
 
         <el-dropdown>
           <span class="user-info">
-            <el-avatar 
-            src="https://ai-public.mastergo.com/ai/img_res/a93bbe33fd3e1e553f303ad4f4dd93ec.jpg"
-            class="avatar"
+            <el-avatar
+              src="https://ai-public.mastergo.com/ai/img_res/a93bbe33fd3e1e553f303ad4f4dd93ec.jpg"
+              class="avatar"
             />
             <span class="username">{{ userInfo.username }}</span>
             <el-icon><ArrowDown /></el-icon>
@@ -61,10 +58,9 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-
       </div>
     </el-header>
-  
+
     <div class="main-container">
       <!-- 侧边栏 -->
       <el-aside width="220px" class="sidebar">
@@ -78,14 +74,10 @@
           :router="true"
         >
           <!-- 使用递归组件渲染菜单 -->
-          <menu-item 
-            v-for="item in menuTree" 
-            :key="item.id"
-            :menu-item="item"
-          />
+          <menu-item v-for="item in menuTree" :key="item.id" :menu-item="item" />
         </el-menu>
       </el-aside>
-  
+
       <!-- 主内容 -->
       <el-main class="main-content">
         <!-- 面包屑 -->
@@ -109,11 +101,28 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router' // 添加useRouter导入
 import { ElLoading } from 'element-plus' // 添加ElLoading导入
 import {
-  Grid, Connection, Search, Plus,
-  ArrowDown, User, Bell, Setting,
-  RefreshRight, Expand, Star, ChatDotRound,
-  Document, Monitor, Share, Lock, DataAnalysis, Headset,
-  Menu, Avatar, InfoFilled, HomeFilled
+  Grid,
+  Connection,
+  Search,
+  Plus,
+  ArrowDown,
+  User,
+  Bell,
+  Setting,
+  RefreshRight,
+  Expand,
+  Star,
+  ChatDotRound,
+  Document,
+  Monitor,
+  Share,
+  Lock,
+  DataAnalysis,
+  Headset,
+  Menu,
+  Avatar,
+  InfoFilled,
+  HomeFilled,
 } from '@element-plus/icons-vue'
 import { getMenuList } from '@/api/system/menu'
 import { getUserInfo } from '@/api/system/login'
@@ -131,26 +140,29 @@ const refreshPage = () => {
   const loading = ElLoading.service({
     lock: true,
     text: '页面刷新中...',
-    background: 'rgba(0, 0, 0, 0.7)'
+    background: 'rgba(0, 0, 0, 0.7)',
   })
-  
+
   // 刷新当前路由
   setTimeout(() => {
-    router.replace({
-      path: '/redirect' + route.fullPath
-    }).catch(() => {
-      // 如果没有设置redirect路由，则使用window.location.reload()
-      window.location.reload()
-    }).finally(() => {
-      loading.close()
-    })
+    router
+      .replace({
+        path: '/redirect' + route.fullPath,
+      })
+      .catch(() => {
+        // 如果没有设置redirect路由，则使用window.location.reload()
+        window.location.reload()
+      })
+      .finally(() => {
+        loading.close()
+      })
   }, 300)
 }
 
 // 用户信息响应式对象
 const userInfo = ref({
   username: '',
-  avatar: ''
+  avatar: '',
 })
 
 // 新增获取用户信息方法
@@ -174,18 +186,21 @@ const currentMenuTitle = computed(() => {
 })
 
 // 监听路由变化，更新激活的菜单项
-watch(() => route.path, (newPath) => {
-  activeMenu.value = newPath
-})
+watch(
+  () => route.path,
+  (newPath) => {
+    activeMenu.value = newPath
+  },
+)
 
 // 获取当前菜单标题
 const getCurrentMenuTitle = () => {
   const currentPath = route.path
-  
+
   // 递归查找菜单项
   const findMenuItem = (items) => {
     if (!items) return '系统公告'
-    
+
     for (const item of items) {
       if (item.path === currentPath) {
         return item.title
@@ -197,7 +212,7 @@ const getCurrentMenuTitle = () => {
     }
     return '系统公告'
   }
-  
+
   return findMenuItem(menuTree.value)
 }
 
@@ -205,7 +220,7 @@ const getCurrentMenuTitle = () => {
 const addDynamicRoutes = (menuItems) => {
   // 递归处理菜单项
   const processMenuItems = (items) => {
-    items.forEach(item => {
+    items.forEach((item) => {
       // 只处理有component属性的菜单项
       if (item.component) {
         try {
@@ -213,25 +228,25 @@ const addDynamicRoutes = (menuItems) => {
           const asyncComponent = () => {
             return new Promise((resolve, reject) => {
               // 打印组件路径，帮助调试
-              console.log(`尝试加载组件: ${item.component}`);
-              
+              console.log(`尝试加载组件: ${item.component}`)
+
               // 根据组件名称动态导入对应组件
-              const componentPath = `../views/system/${item.component}.vue`;
-              console.log('实际加载路径:', componentPath);
-              
+              const componentPath = `../views/system/${item.component}.vue`
+              console.log('实际加载路径:', componentPath)
+
               import(componentPath)
-                .then(module => {
-                  console.log(`组件 ${item.component} 加载成功`);
-                  resolve(module);
+                .then((module) => {
+                  console.log(`组件 ${item.component} 加载成功`)
+                  resolve(module)
                 })
-                .catch(error => {
-                  console.warn(`组件 ${item.component} 不存在，使用默认组件`);
-                  console.error('组件加载错误详情:', error);
-                  import('../components/NotFound.vue').then(module => resolve(module));
-                });
-            });
-          };
-          
+                .catch((error) => {
+                  console.warn(`组件 ${item.component} 不存在，使用默认组件`)
+                  console.error('组件加载错误详情:', error)
+                  import('../components/NotFound.vue').then((module) => resolve(module))
+                })
+            })
+          }
+
           // 添加路由 - 确保路径不包含中文或特殊字符
           router.addRoute('home', {
             path: item.path,
@@ -243,54 +258,54 @@ const addDynamicRoutes = (menuItems) => {
               permission: item.permission,
               keepAlive: item.keepAlive === 1,
               requiresAuth: true,
-              type: item.type
-            }
-          });
-          
-          console.log(`添加路由: ${item.path}, 组件: ${item.component}`);
+              type: item.type,
+            },
+          })
+
+          console.log(`添加路由: ${item.path}, 组件: ${item.component}`)
         } catch (error) {
-          console.error(`添加路由失败: ${item.path}`, error);
+          console.error(`添加路由失败: ${item.path}`, error)
         }
       }
-      
+
       // 递归处理子菜单
       if (item.children && item.children.length) {
-        processMenuItems(item.children);
+        processMenuItems(item.children)
       }
-    });
-  };
-  
-  processMenuItems(menuItems);
-  
+    })
+  }
+
+  processMenuItems(menuItems)
+
   // 保存菜单数据到localStorage，用于刷新后恢复
-  localStorage.setItem('menuData', JSON.stringify(menuItems));
-};
+  localStorage.setItem('menuData', JSON.stringify(menuItems))
+}
 
 // 获取菜单数据
 const fetchMenuData = async () => {
   try {
     const response = await getMenuList()
-    console.log("菜单数据:", response.data)
-    
+    console.log('菜单数据:', response.data)
+
     // 检查菜单数据中的组件路径
     const checkComponentPaths = (items) => {
-      items.forEach(item => {
+      items.forEach((item) => {
         if (item.component) {
-          console.log(`菜单项 ${item.title} 的组件路径: ${item.component}`);
+          console.log(`菜单项 ${item.title} 的组件路径: ${item.component}`)
         }
         if (item.children && item.children.length) {
-          checkComponentPaths(item.children);
+          checkComponentPaths(item.children)
         }
-      });
-    };
-    
+      })
+    }
+
     if (response.data) {
       // 检查组件路径
-      checkComponentPaths(response.data);
-      
+      checkComponentPaths(response.data)
+
       // 直接使用后端返回的数据
       menuTree.value = response.data
-      
+
       // 动态添加路由
       addDynamicRoutes(menuTree.value)
 
@@ -316,7 +331,7 @@ const logout = () => {
 }
 </script>
 
-<style scoped lang="scss"> 
+<style scoped lang="scss">
 .app-container {
   display: flex;
   flex-direction: column;

@@ -6,7 +6,7 @@
         <img src="@/assets/logo.png" class="logo" />
         <span class="system-title">后台管理系统</span>
       </div>
-      
+
       <el-menu
         :default-active="activeMenu"
         router
@@ -48,7 +48,7 @@
             <el-badge :value="3" class="badge">
               <el-icon :size="20"><Bell /></el-icon>
             </el-badge>
-            
+
             <el-dropdown>
               <span class="user-info">
                 <el-avatar :size="30" src="@/assets/user-avatar.png" />
@@ -69,28 +69,21 @@
       <!-- 内容区域 -->
       <el-main class="main-content">
         <div>首页内容展示</div>
-    
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getUserInfo } from '@/api/system/login'
-import {
-  PieChart,
-  User,
-  Lock,
-  Bell,
-  ArrowDown
-} from '@element-plus/icons-vue'
+import { PieChart, User, Lock, Bell, ArrowDown } from '@element-plus/icons-vue'
 
 // 用户信息响应式对象
 const userInfo = ref({
   username: '',
-  avatar: ''
+  avatar: '',
 })
 
 const router = useRouter()
@@ -118,7 +111,7 @@ const logout = () => {
 }
 </script>
 
-<style scoped lang="scss"> 
+<style scoped lang="scss">
 .system-container {
   height: 100vh;
 }
@@ -134,12 +127,12 @@ const logout = () => {
   align-items: center;
   padding: 0 15px;
   color: #fff;
-  
+
   .logo {
     width: 32px;
     margin-right: 10px;
   }
-  
+
   .system-title {
     font-size: 18px;
     white-space: nowrap;
@@ -151,7 +144,7 @@ const logout = () => {
   align-items: center;
   justify-content: flex-end;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 }
 
 .main-content {
@@ -164,7 +157,7 @@ const logout = () => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  
+
   .username {
     font-size: 14px;
   }

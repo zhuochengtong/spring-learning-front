@@ -9,7 +9,7 @@ const router = useRouter()
 onBeforeMount(() => {
   const { params } = route
   const { path } = params
-  console.log("刷新触发重定向 /path 为/"+ path)
+  console.log('刷新触发重定向 /path 为/' + path)
   router.replace({ path: '/' + path })
 })
 </script>

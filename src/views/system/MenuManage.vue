@@ -21,12 +21,7 @@
       <!-- （2）右侧搜索区：搜索菜单的输入框和按钮 -->
       <div class="right-search">
         <!-- 搜索输入框 -->
-        <el-input
-          v-model="searchKey"
-          placeholder="请输入菜单名称"
-          class="search-input"
-          clearable
-        >
+        <el-input v-model="searchKey" placeholder="请输入菜单名称" class="search-input" clearable>
           <!-- 搜索图标前缀 -->
           <template #prefix>
             <el-icon><Search /></el-icon>
@@ -77,18 +72,14 @@
         <!-- 状态列：显示菜单是否启用的开关 -->
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="scope">
-            <el-switch
-              v-model="scope.row.status"
-              :active-value="1"
-              :inactive-value="0"
-            />
+            <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
           </template>
         </el-table-column>
         <!-- 操作列：提供编辑、添加子菜单、删除功能 -->
         <el-table-column label="操作" width="220" align="center" fixed="right">
           <template #default="scope">
             <!-- 编辑按钮：编辑当前菜单 -->
-            <el-button type="primary" link @click="handleEditMenu(scope.row)" >
+            <el-button type="primary" link @click="handleEditMenu(scope.row)">
               <el-icon><Edit /></el-icon>编辑
             </el-button>
             <!-- 添加子菜单按钮：在当前菜单下添加子菜单 -->
@@ -112,11 +103,7 @@
       destroy-on-close
     >
       <!-- 菜单表单：包含菜单的各项属性输入 -->
-      <el-form
-        ref="menuFormRef"
-        :model="menuForm"
-        label-width="100px"
-      >
+      <el-form ref="menuFormRef" :model="menuForm" label-width="100px">
         <!-- 上级菜单选择：选择菜单的父级 -->
         <el-form-item label="上级菜单" prop="parentId">
           <el-tree-select
@@ -180,17 +167,23 @@
 </template>
 
 <script setup>
-
 // 1、import 导入
 // 导入Vue的响应式API，ref: 用于创建基本类型的响应式引用，reactive: 用于创建复杂对象的响应式状态
 import { ref, reactive } from 'vue'
 // 导入Element Plus图标组件，这些图标将用于界面中的按钮和表格等位置
 import {
-  Plus, Edit, Delete, Search, RefreshRight,
-  Expand, Document, Menu, Setting
+  Plus,
+  Edit,
+  Delete,
+  Search,
+  RefreshRight,
+  Expand,
+  Document,
+  Menu,
+  Setting,
 } from '@element-plus/icons-vue'
 // 引入接口函数
-import { getMenuList, addMenu, updateMenu, deleteMenu} from '@/api/system/menu'
+import { getMenuList, addMenu, updateMenu, deleteMenu } from '@/api/system/menu'
 // 组件挂载时执行的钩子函数
 import { onMounted } from 'vue'
 // 导入Element Plus消息提示组件
@@ -222,7 +215,7 @@ const menuForm = reactive({
   icon: '',
   sort: 0,
   type: 0,
-  status: 1
+  status: 1,
 })
 // 是否为编辑模式
 const isEdit = ref(false)
@@ -231,8 +224,8 @@ const menuTreeData = ref([
   {
     id: 0,
     label: '顶级菜单',
-    children: []
-  }
+    children: [],
+  },
 ])
 
 // 3、事件处理函数
@@ -272,31 +265,31 @@ const fetchMenuData = async () => {
 const formatMenuTreeData = () => {
   // 深拷贝菜单数据，避免直接修改原始数据，防止引用类型带来的副作用
   const formattedData = JSON.parse(JSON.stringify(menuData.value))
-  
+
   // 定义内部转换函数，用于递归处理菜单数据
   const convertData = (items) => {
     // 如果传入的数组为空或不存在，则返回空数组
     if (!items || !items.length) return []
-    
+
     // 使用map方法遍历数组中的每一项，并进行格式转换
-    return items.map(item => {
+    return items.map((item) => {
       // 创建新的对象，按照el-tree-select组件要求的格式进行转换
       const newItem = {
-        id: item.id,         // 保留原始ID作为节点的唯一标识
-        label: item.title,   // 将菜单标题转换为显示标签
-        value: item.id       // 将ID设置为选中时的值
+        id: item.id, // 保留原始ID作为节点的唯一标识
+        label: item.title, // 将菜单标题转换为显示标签
+        value: item.id, // 将ID设置为选中时的值
       }
-      
+
       // 如果当前项有子菜单，则递归处理子菜单
       if (item.children && item.children.length) {
         newItem.children = convertData(item.children)
       }
-      
+
       // 返回转换后的菜单项
       return newItem
     })
   }
-  
+
   // 设置顶级菜单的子菜单，将转换后的数据作为顶级菜单的子节点
   menuTreeData.value[0].children = convertData(formattedData)
 }
@@ -317,7 +310,7 @@ const handleAddMenu = () => {
  * 打开菜单表单对话框函数，准备编辑菜单
  * @param {Object} row 当前行的菜单数据
  */
- const handleEditMenu = (row) => {
+const handleEditMenu = (row) => {
   // 设置为编辑模式
   isEdit.value = true
   // 复制当前行数据到表单
@@ -330,7 +323,7 @@ const handleAddMenu = () => {
  * 打开菜单表单对话框函数，准备添加子菜单
  * @param {Object} row 当前行的菜单数据，作为父菜单
  */
- const handleAddChildMenu = (row) => {
+const handleAddChildMenu = (row) => {
   // 设置为新增模式
   isEdit.value = false
   // 重置表单
@@ -345,7 +338,7 @@ const handleAddMenu = () => {
  * 重置菜单表单数据
  * 将表单数据恢复到初始状态
  */
- const resetMenuForm = () => {
+const resetMenuForm = () => {
   // 重置表单为默认值
   Object.assign(menuForm, {
     id: null,
@@ -357,7 +350,7 @@ const handleAddMenu = () => {
     icon: '',
     sort: 0,
     type: 0,
-    status: 1
+    status: 1,
   })
 }
 
@@ -376,7 +369,7 @@ const submitMenuForm = async () => {
     await formEl.validate()
     // 显示加载状态
     loading.value = true
-    
+
     let res
     if (isEdit.value) {
       // 编辑模式：调用更新菜单接口
@@ -387,7 +380,7 @@ const submitMenuForm = async () => {
       res = await addMenu(menuForm)
       ElMessage.success('新增菜单成功')
     }
-    
+
     // 关闭对话框
     dialogVisible.value = false
     // 刷新菜单数据
@@ -404,47 +397,47 @@ const submitMenuForm = async () => {
 
 /**
  * 删除菜单函数
- * @param {*} row 
+ * @param {*} row
  */
 const handlDeleteMenu = async (row) => {
   // 显示确认对话框
   ElMessageBox.confirm('确认删除改菜单吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    // 用户确认删除
-    try {
-      // 调用删除菜单接口
-      const res = await deleteMenu(row.id)
-      if (res.code === 200) {
-        // 删除成功，刷新菜单数据
-        await fetchMenuData()
-        ElMessage.success('删除菜单成功')
-      } else {
-        // 删除失败，显示错误信息
-        ElMessage.error(res.message)
-      }
-    } catch (error) {
-      console.error('删除菜单失败:', error)
-      ElMessage.error('删除菜单失败')
-    }
-  }).catch(() => {
-    // 用户取消删除
-    ElMessage.info('已取消删除')
+    type: 'warning',
   })
+    .then(async () => {
+      // 用户确认删除
+      try {
+        // 调用删除菜单接口
+        const res = await deleteMenu(row.id)
+        if (res.code === 200) {
+          // 删除成功，刷新菜单数据
+          await fetchMenuData()
+          ElMessage.success('删除菜单成功')
+        } else {
+          // 删除失败，显示错误信息
+          ElMessage.error(res.message)
+        }
+      } catch (error) {
+        console.error('删除菜单失败:', error)
+        ElMessage.error('删除菜单失败')
+      }
+    })
+    .catch(() => {
+      // 用户取消删除
+      ElMessage.info('已取消删除')
+    })
 }
 
 /**
  * 组件挂载后自动执行
  * 初始化页面数据
  */
- onMounted(() => {
+onMounted(() => {
   // 组件挂载后自动获取菜单数据
   fetchMenuData()
 })
-
-
 </script>
 
 <style scoped lang="scss">
@@ -456,16 +449,16 @@ const handlDeleteMenu = async (row) => {
   display: flex;
   justify-content: space-between;
   margin-bottom: 16px;
-  
+
   .left-actions {
     display: flex;
     gap: 8px;
   }
-  
+
   .right-search {
     display: flex;
     gap: 8px;
-    
+
     .search-input {
       width: 220px;
     }
