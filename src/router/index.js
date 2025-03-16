@@ -45,7 +45,16 @@ const router = createRouter({
             requiresAuth: true,
           },
         },
-        // 动态路由将在菜单加载后添加
+        // 添加404子路由，用于捕获/home下的所有未匹配路径
+        {
+          path: '/:pathMatch(.*)*',
+          name: 'not-found-in-home',
+          component: () => import('@/components/NotFound.vue'),
+          meta: {
+            title: '页面不存在',
+            requiresAuth: false,
+          },
+        }
       ],
     },
     {
@@ -89,6 +98,7 @@ const router = createRouter({
 // 在导出路由前添加
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || '默认标题'
+  
   next()
 })
 
