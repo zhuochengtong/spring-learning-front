@@ -65,7 +65,7 @@ const getCurrentMenuTitle = () => {
   
   // 递归查找菜单项
   const findMenuItem = (items) => {
-    if (!items) return '系统公告'
+    if (!items) return '首页'
     
     for (const item of items) {
       if (item.path === currentPath) {
@@ -73,10 +73,10 @@ const getCurrentMenuTitle = () => {
       }
       if (item.children && item.children.length) {
         const found = findMenuItem(item.children)
-        if (found !== '系统公告') return found
+        if (found !== '首页') return found
       }
     }
-    return '系统公告'
+    return '首页'
   }
   
   return findMenuItem(menuTree.value)

@@ -44,11 +44,9 @@
         style="width: 100%"
         v-loading="loading"
       >
-        <!-- 菜单名称列：显示图标和名称 -->
+        <!-- 菜单名称列：显示名称 -->
         <el-table-column prop="title" label="菜单名称" min-width="180">
           <template #default="scope">
-            <!-- 菜单图标 -->
-            <el-icon v-if="scope.row.icon"><component :is="scope.row.icon" /></el-icon>
             <!-- 菜单名称 -->
             <span style="margin-left: 8px">{{ scope.row.title }}</span>
           </template>
