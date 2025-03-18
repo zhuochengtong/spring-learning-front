@@ -45,6 +45,15 @@ const router = createRouter({
             requiresAuth: true,
           },
         },
+        {
+          path: '/permission/user',
+          name: 'UserManage',
+          component: () => import('@/views/system/UserManage.vue'),
+          meta: {
+            title: '用户管理',
+            icon: 'User'
+          }
+        },
         // 添加404子路由，用于捕获/home下的所有未匹配路径
         {
           path: '/:pathMatch(.*)*',
