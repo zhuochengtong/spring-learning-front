@@ -54,6 +54,15 @@ const router = createRouter({
             icon: 'User'
           }
         },
+        {
+          path: '/file/user',
+          name: 'FileManage',
+          component: () => import('@/views/system/FileManage.vue'),
+          meta: {
+            title: '文件管理',
+            icon: 'User'
+          }
+        },
         // 添加404子路由，用于捕获/home下的所有未匹配路径
         {
           path: '/:pathMatch(.*)*',
@@ -104,10 +113,28 @@ const router = createRouter({
   ],
 })
 
-// 在导出路由前添加
+// 在路由配置文件中添加全局前置守卫
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || '默认标题'
+  document.title = to.meta.title || 'Spring Learning'
+  const token = localStorage.getItem('token')
   
+  // 如果访问的是登录页，直接放行
+  if (to.path === '/login') {
+    next()
+    return
+  }
+  
+  // 检查是否有token
+  if (!token) {
+    // 没有token，跳转到登录页
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath } // 保存要访问的路由
+    })
+    return
+  }
+  
+  // 有token，继续访问
   next()
 })
 
