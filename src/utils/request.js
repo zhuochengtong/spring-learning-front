@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { ElMessage } from 'element-plus' // 添加导入 ElMessage
+import router from '@/router' // 导入路由
 
 // 环境变量访问方式
 const service = axios.create({
@@ -40,9 +42,9 @@ service.interceptors.response.use(
       })
       
       // 延迟跳转到登录页，让用户有时间看到提示信息
-      setTimeout(() => {
-        window.location.href = '/login'
-      }, 1500)
+      // setTimeout(() => {
+      //   window.location.href = '/login'
+      // }, 1500)
     }
     
     console.error('请求错误:', error)
