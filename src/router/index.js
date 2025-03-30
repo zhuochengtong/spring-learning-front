@@ -63,6 +63,15 @@ const router = createRouter({
             icon: 'User'
           }
         },
+        {
+          path: '/file/viewFile',
+          name: 'FileListManage',
+          component: () => import('@/views/system/FileListManage.vue'),
+          meta: {
+            title: '文件列表',
+            icon: 'User'
+          }
+        },
         // 添加404子路由，用于捕获/home下的所有未匹配路径
         {
           path: '/:pathMatch(.*)*',
