@@ -2,10 +2,6 @@
   <div class="guest-container">
     <!-- 新增隐藏的文件上传输入 -->
     <input ref="fileInput" type="file" style="display: none" @change="handleFileSelect" />
-    <!-- 功能导航 -->
-    <div class="toolbar">
-      <el-button type="primary" @click="handleLogin">登录/注册</el-button>
-    </div>
 
     <!-- 工具展示区 -->
     <div class="tool-grid">
@@ -32,40 +28,30 @@
         上传完成！文件正在转码处理...
       </div>
     </div>
-    <div class="guest-notice">
-      <el-alert type="info" show-icon :closable="false">
-        <template #title>
-          <span>游客模式下部分功能受限，请</span>
-          <el-link type="primary" @click="handleLogin">登录</el-link>
-          <span>或</span>
-          <el-link type="primary" @click="handleRegister">注册</el-link>
-          <span>后使用完整功能</span>
-        </template>
-      </el-alert>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus' // 新增导入消息组件
-import { useRouter, useRoute } from 'vue-router' // 添加 useRoute
-import { ref, markRaw, onMounted, watch } from 'vue' // 添加 watch
+import { ElMessage } from 'element-plus' 
+import { useRouter, useRoute } from 'vue-router' 
+import { ref, markRaw, onMounted, watch } from 'vue' 
 import { Upload, Download, Share, Delete, View, Setting, Files } from '@element-plus/icons-vue'
-import fileApi from '@/api/file/file'
+// 修改导入方式，使用命名导入
+import { checkChunks, uploadChunk, mergeFile } from '@/api/system/file'
 import SparkMD5 from 'spark-md5'
 
 const router = useRouter()
-const fileInput = ref(null) // 文件输入引用
-const uploadProgress = ref(0) // 上传进度状态
-// 新增状态管理变量
-const uploadStatus = ref('') // 'success' | 'error' | ''
-// 修改进度条状态设置
-uploadStatus.value = 'exception' // 使用element-plus官方状态值
+const fileInput = ref(null) 
+const uploadProgress = ref(0) 
+const uploadStatus = ref('') 
+uploadStatus.value = 'exception' 
 
 // 新增页面初始化逻辑
 const initPage = () => {
-  console.log('游客页面初始化')
-  // 这里可以添加数据加载逻辑
+  console.log('文件管理页面初始化')
+  // 重置上传状态
+  uploadProgress.value = 0
+  uploadStatus.value = ''
 }
 
 // 监听路由变化
@@ -82,8 +68,7 @@ onMounted(() => {
   initPage()
 })
 
-// 工具列表数据
-// 修改工具列表定义
+// 工具列表数据保持不变
 const tools = ref([
   {
     title: '文件预览',
@@ -127,9 +112,15 @@ const tools = ref([
     description: '支持大文件分片上传',
     action: 'upload',
   },
+  {
+    title: '文件列表',
+    icon: markRaw(View), 
+    description: '查看已上传的文件',
+    action: 'listFile',
+  },
 ])
 
-// 工具点击处理
+// 工具点击处理保持不变
 const handleToolClick = (action) => {
   // 根据实际需求实现不同功能
   console.log('触发功能:', action)
@@ -140,17 +131,11 @@ const handleToolClick = (action) => {
     fileInput.value.click() // 触发文件选择
     return
   }
+  if (action === 'listFile') {
+    router.push('/file/viewFile') // 需要配置对应路由
+  }
 }
 
-// 登录跳转
-const handleLogin = () => {
-  router.push('/login')
-}
-
-// 注册跳转
-const handleRegister = () => {
-  router.push('/register') // 需要配置注册路由
-}
 // 文件选择处理
 const handleFileSelect = async (e) => {
   const file = e.target.files[0]
@@ -166,40 +151,39 @@ const handleFileSelect = async (e) => {
     fileInput.value.value = '' // 清空选择
   }
 }
-// 在uploadFile函数中修改分片上传逻辑
+
+// 修改上传文件逻辑，使用命名导入的函数
 const uploadFile = async (file) => {
   try {
-    const CHUNK_SIZE = 5 * 1024 * 1024 // 使用常量定义分片大小
+    const CHUNK_SIZE = 5 * 1024 * 1024
     const chunks = Math.ceil(file.size / CHUNK_SIZE)
     const fileHash = await calcFileHash(file)
-    // 1. 增强分片检查逻辑
-    // 错误调用方式
-    // const { data } = await fileApi.checkChunks(fileHash, chunks)
-    // 正确调用方式（添加参数对象包装）
-    const response = await fileApi
-      .checkChunks({
-        fileHash,
-        total: chunks,
-      })
-      .catch(handleCheckError)
-    // 添加空值保护
-    const data = response?.data || { existedChunks: [] }
-    // 2. 并行上传优化（限制并发数）
+    
+    // 使用命名导入的checkChunks函数
+    const response = await checkChunks({
+      fileHash,
+      total: chunks,
+    }).catch(handleCheckError)
+    
+    // 由于checkChunks已经处理了兜底数据，这里可以简化
+    const existedChunks = response.existedChunks || []
+    
+    // 并行上传优化
     const uploadQueue = []
-    let uploadedCount = data.existedChunks?.length || 0
+    let uploadedCount = existedChunks.length || 0
 
     for (let i = 0; i < chunks; i++) {
-      if (data.existedChunks?.includes(i)) continue
+      if (existedChunks.includes(i)) continue
 
       const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
       const formData = new FormData()
-      formData.append('chunk', chunk) // 修改参数名与后端对应
+      formData.append('chunk', chunk)
       formData.append('fileHash', fileHash)
       formData.append('chunkIndex', i)
       formData.append('totalChunks', chunks)
 
       uploadQueue.push(() =>
-        fileApi.uploadChunk(formData).then(() => {
+        uploadChunk(formData).then(() => {
           uploadedCount++
           uploadProgress.value = Math.min(95, Math.round((uploadedCount / chunks) * 95))
         }),
@@ -212,8 +196,8 @@ const uploadFile = async (file) => {
       await Promise.all(uploadQueue.slice(i, i + PARALLEL_LIMIT).map((fn) => fn()))
     }
 
-    // 3. 增强合并请求
-    await fileApi.mergeFile({
+    // 使用命名导入的mergeFile函数
+    await mergeFile({
       fileHash,
       fileName: file.name,
       totalChunks: chunks,
@@ -227,7 +211,7 @@ const uploadFile = async (file) => {
   }
 }
 
-// 新增错误处理函数
+// 错误处理函数
 const handleCheckError = (error) => {
   if (error.response?.status === 401) {
     router.push('/login')
@@ -235,12 +219,11 @@ const handleCheckError = (error) => {
   throw new Error(`分片检查失败: ${error.message}`)
 }
 
-// 文件哈希计算函数
+// 文件哈希计算函数保持不变
 const calcFileHash = (file) => {
   return new Promise((resolve) => {
     const spark = new SparkMD5.ArrayBuffer()
     const reader = new FileReader()
-
     reader.onload = (e) => {
       spark.append(e.target.result)
       resolve(spark.end())
@@ -258,11 +241,6 @@ const calcFileHash = (file) => {
   margin: 0 auto; // 水平居中
   padding: 20px; // 内边距
 
-  // 顶部工具栏样式
-  .toolbar {
-    text-align: right; // 按钮右对齐
-    margin-bottom: 30px; // 底部外边距
-  }
 
   // 工具卡片网格容器
   .tool-grid {
@@ -317,17 +295,6 @@ const calcFileHash = (file) => {
       }
     }
   }
-
-  // 底部提示信息容器
-  .guest-notice {
-    margin-top: 40px; // 顶部外边距
-
-    // 链接样式调整
-    .el-link {
-      vertical-align: baseline; // 垂直对齐基线
-      margin: 0 5px; // 左右外边距
-    }
-  }
 }
 
 .upload-progress {
@@ -343,3 +310,4 @@ const calcFileHash = (file) => {
 }
 </style>
 @/api/file/file
+@/api/system/file

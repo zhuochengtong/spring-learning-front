@@ -343,3 +343,4 @@ const calcFileHash = (file) => {
 }
 </style>
 @/api/file/file
+@/api/system/file
